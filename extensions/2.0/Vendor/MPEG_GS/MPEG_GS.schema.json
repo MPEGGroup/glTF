@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "MPEG_GS glTF primitive extension",
+  "type": "object",
+  "description": "glTF extension for binding 3D and 4D Gaussian Splats to POINTS primitives with baseline POSITION and COLOR_0 fallback.",
+  "allOf": [
+    {
+      "$ref": "glTFProperty.schema.json"
+    },
+    {
+      "if": {
+        "properties": {
+          "shLayout": {
+            "const": "progressive"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "shCoeffFirst",
+          "shCoeffSecond",
+          "shCoeffThird"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "shLayout": {
+            "const": "perChannel"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "shCoeffR",
+          "shCoeffG",
+          "shCoeffB"
+        ]
+      }
+    }
+  ],
+  "properties": {
+    "shLayout": {
+      "type": "string",
+      "description": "Spherical harmonic coefficient layout signaled for this primitive.",
+      "enum": [
+        "progressive",
+        "perChannel"
+      ]
+    },
+    "orientation": {
+      "description": "Reference to an accessor or timed accessor of type VEC4 containing quaternion (x, y, z, w) per splat.",
+      "$ref": "#/definitions/accessorOrTimedAccessor"
+    },
+    "scale": {
+      "description": "Reference to an accessor or timed accessor of type VEC3 containing ellipsoid scale per splat.",
+      "$ref": "#/definitions/accessorOrTimedAccessor"
+    },
+    "shCoeffR": {
+      "description": "Per channel layout. Reference to an accessor or timed accessor of type SCALAR containing 15 coefficients per splat for red.",
+      "$ref": "#/definitions/accessorOrTimedAccessor"
+    },
+    "shCoeffG": {
+      "description": "Per channel layout. Reference to an accessor or timed accessor of type SCALAR containing 15 coefficients per splat for green.",
+      "$ref": "#/definitions/accessorOrTimedAccessor"
+    },
+    "shCoeffB": {
+      "description": "Per channel layout. Reference to an accessor or timed accessor of type SCALAR containing 15 coefficients per splat for blue.",
+      "$ref": "#/definitions/accessorOrTimedAccessor"
+    },
+    "shCoeffFirst": {
+      "description": "Progressive layout. Reference to an accessor or timed accessor of type SCALAR containing 9 coefficients per splat.",
+      "$ref": "#/definitions/accessorOrTimedAccessor"
+    },
+    "shCoeffSecond": {
+      "description": "Progressive layout. Reference to an accessor or timed accessor of type SCALAR containing 15 coefficients per splat.",
+      "$ref": "#/definitions/accessorOrTimedAccessor"
+    },
+    "shCoeffThird": {
+      "description": "Progressive layout. Reference to an accessor or timed accessor of type SCALAR containing 21 coefficients per splat.",
+      "$ref": "#/definitions/accessorOrTimedAccessor"
+    },
+    "extensions": {},
+    "extras": {}
+  },
+  "required": [
+    "shLayout",
+    "orientation",
+    "scale"
+  ],
+  "definitions": {
+    "accessorOrTimedAccessor": {
+      "description": "Reference to a glTF accessor index for static data, or an object referencing a timed accessor for dynamic data.",
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Index of an accessor in the top level accessors array for static data."
+        },
+        {
+          "type": "object",
+          "description": "Reference to a timed accessor object defined by MPEG timed media extensions.",
+          "required": [
+            "timedAccessor"
+          ],
+          "properties": {
+            "timedAccessor": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Index of a timed accessor object, as defined by MPEG_accessor_timed."
+            }
+          },
+          "additionalProperties": true
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}
