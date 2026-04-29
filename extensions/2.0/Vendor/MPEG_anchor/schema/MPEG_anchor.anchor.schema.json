@@ -44,6 +44,11 @@
             "description": "Reference to an item in the lights array of the MPEG_lights_video_based extension.",
             "type": "integer"
         },
+        "recommendedSpatialComputingConfig":{
+            "description": "Set of recommended parameters specifying the needed spatial description. ",
+            "type" :"object",
+            "$ref": "MPEG_recommendedSpatialComputingConfig.schema.json"
+        },
         "extensions": {},
         "extras": {}
     },

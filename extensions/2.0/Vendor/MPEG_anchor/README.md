@@ -45,14 +45,80 @@ Table 2 – Definition of the Anchor object
 | aligned | enumeration | No | NOT_USED | The aligned flag may take one of the following values: NOT_USED=0, ALIGNED_NOTSCALED=1, ALIGNED_SCALED=2.</br>If ALIGNED_SCALED is set, the bounding box of the virtual assets attached to that anchor is aligned and scaled to match the bounding box of the real-world available space associated with the trackable as estimated by the XR runtime. |
 | actions | array(number) | No | N/A | Indices of the actions in the actions array of the interactivity extension to be executed once the pose of this anchor is determined. An example is a setTransform action to place the virtual assets attached to that anchor. |
 | light | integer | No | N/A | Reference to an item in the lights array of the MPEG_lights_texture_based extension. |
+|recommendedSpatialComputingConfig|[`recommendedSpatialComputingConfig`](#reference-mpeg_gltf_anchor-spatial)| No |N/A | Set of recommended parameters specifying the needed spatial description. |
+
+<a id="reference-mpeg_gltf_anchor-spatial"></a>
+
+Table 3: definition of the recommendedSpatialComputingConfig object
+|Name |Type|Required|Default |Description|
+|---|---|---|---|---|
+|**scanOptions**|`integer` `[]`|No| |Array of one or more elements (enumeration) of the table 4 giving options for the scan generation|
+|**scanDetails**|[`scanDetails`](#reference-mpeg_gltf_anchor-spatial-details)|No||The required level of detail for the mesh|
+|**scanUpdate**|[`update`](#reference-mpeg_gltf_anchor-spatial-update)|No||Specifies the frequency of the update process.|
+|**scanVolumes**|[`scanVolumes`](#reference-mpeg_gltf_anchor-spatial-volumes) `[]`|No||Array of bounding volumes that determine the spaces where scanned objects must be provided. Real scan objects that intersect one or more of the bounding volumes should be provided, and all other objects ignored. |
+|**realSemantic**|`string` `[]`|No||Semantic descriptions of nodes that are needed.(“table”, “room”, “chair”, “wall”, “light”, “freespace” …)|
+|**lightOptions**|`integer` `[]`|No||Array of one or more elements (enumeration) of the table 5 giving options for the light extraction.|No|
+|**lightUpdate**|[`update`](#reference-mpeg_gltf_anchor-spatial-update)|No||Specifies the frequency of the update process.|No|
+
+
+Table 4: Possible values of a scanOptions item
+|Enumeration values   | Description|
+|---|---|
+|PLANE  = 0	|Request plane data for scanned objects|
+|PLANAR_MESH	|Request planar meshes for scanned objects|
+|VISUAL_MESH	|Request 3D visualization meshes for scanned objects|
+|COLLIDER_MESH	|Request 3D collider meshes for scanned objects|
+|FREE_VOLUME	|Request to get the available space around a trackable|
+|BOUNDING_BOX	|Request a simplified collider mesh|
+|TEXTURED_MESH	|Request mesh with a texture|
+
+
+<a id="reference-mpeg_gltf_anchor-spatial-details"></a>
+The definition of the scanDetails item is provided here after.
+
+|Name   |Type|Required | Default| Description|
+|---|---|---|---|---|
+|**primitivesNumber**|`number`|No||The quantity of geometric primitives per m3|
+|**textureOption**|`integer`|No| 0|The resolution of the texture of textured mesh. Possible values are R512x512 (0), R1024x1024 (1) or R2048x2048 (2)|
+
+<a id="reference-mpeg_gltf_anchor-spatial-volumes"></a>
+The definition of a scanVolumes item is provided here after.
+
+|Name |Type|Required|Default| Description|
+|---|---|---|---|---|
+|**type**|`integer`|No | 0| The type of bounding volume. Possible values are SPHERE (0), BOX (1) or FRUSTUM (2).|
+|**center**|`number` `[3]`|No | `[0,0,0]` | 3D coordinate of the center of the sphere.|
+|**radius**|`number`|No | | Radius of the sphere in meters..|
+|**pose**|`number` `[16-*]`|No | | 4x4 matrix representing the center position and orientation of the bounding volume.|No|
+|**extents**|`number` `[3-*]`|No | | Edge-to-edge length of the box along each dimension.|
+|**fov**|`number` `[4-*]`|No | |Angles of the four sides of the frustum|
+|**far**|`number`|No | |Positive distance of the far plane of the frustum|
+|**near**|`number`|No | |Positive distance of the near plane of the frustum|
+
+Table 5: Possible values of a lightOptions item.
+|Enumeration values   | Description|
+|---|---|
+|DirectionalLight = 0	|Request the extraction of directional lights|
+|EnvLight	|Request the extraction of environment lights|
+|PointLight	|Request the extraction of point lights|
+|SpotLight	|Request the extraction of spot lights|
+|AreaLight	|Request the extraction of area lights|
+
+<a id="reference-mpeg_gltf_anchor-spatial-update"></a>
+The definition of the recommendedSpatialComputingConfig.update object is providedhere after.
+
+|Name  |Type|Required|Default| Description|
+|---|---|---|---|---|
+|**occurences**|`integer`|No | 0 |An occurrence value: <br> - ONCE = 0: the update is performed only once, for instance in case of a static real scene, <br>- N_FRAME: the update is performed periodically, every N rendering frames, N depending on the dynamism of the real scene. The N value is provided in the frameNumber parameter. <br>- AUTO: the update frequency is managed by the module that compute the representation. This module may perform an analysis to detect significant changes in the real world and start an update. This analysis may be performed from raw images data, like RGB images from a camera or depth images from a depth sensor.|
+|**numberOfFrames**|`number`|No ||Indicate the periodicity, in number of frames, of the update, when the occurrences value is N_FRAME.|
 
 <a id="reference-mpeg_gltf_anchor-trackable"></a>
-The definition of the Trackable object is provided in the Table 3.
+The definition of the Trackable object is provided in the Table 6.
 
-Table 3: Definition of the Trackable object
+Table 6: Definition of the Trackable object
 | Name | Type | Required | Default | Description |
 |--|--|--|--|--|
-| type | enumeration |  &#10003; Yes|  | The type of the trackable as defined in Table 4. |
+| type | enumeration |  &#10003; Yes|  | The type of the trackable as defined in Table 7. |
 | if (type == TRACKABLE_CONTROLLER) { |  |  |  |  |
 | path | string |  &#10003; Yes|  | A path that describes the action space as specified by the OpenXR specification in clause 6.2. An example is “/user/hand/left/input”. |
 | } |  |  |  |  |
@@ -69,7 +135,7 @@ Table 3: Definition of the Trackable object
 | trackableId | string |  &#10003; Yes|  | An application-defined trackable id, that is known to the application. |
 | } |  |  |  |  |
 
-Table 4: Definition of the Trackable type
+Table 7: Definition of the Trackable type
 | Trackable type | Description |
 |--|--|
 | TRACKABLE_FLOOR = 0 | See [here](#trackable_floor)|
@@ -84,7 +150,7 @@ Table 4: Definition of the Trackable type
 
 ### Semantics at scene or node level
 
-Table 5: MPEG_anchor object instantiation at the node or scene level
+Table 8: MPEG_anchor object instantiation at the node or scene level
 | Name | Type | Required | Default | Description |
 |--|--|--|--|--|
 | anchor | integer |  &#10003; Yes|  | Reference to an item in the anchors array of the MPEG_anchor extension. |
@@ -167,6 +233,12 @@ To provide the flexibility to define an anchor space different than the trackabl
 Actions are defined in MPEG_scene_interactivity extension.
 
 If the array of action is not empty, the actions are executed once the pose of anchor is determined. If the tracking status is set to FALSE after being TRUE, actions are not canceled.
+
+
+If a [`recommendedSpatialComputingConfig`](#reference-mpeg_gltf_anchor-spatial) object is present, the Presentation Engine checks if it can retrieve the recommended spatial description, specified in the  parameters such as scanOptions, scanDetails, scanUpdate, scanVolumes, scanSemantic, lightUpdate and lightOptions.
+If all the recommended parameters are not satisfied, the Presentation Engine may continue the rendering of the scene with the available spatial description, but possibly with a degraded XR experience.
+At runtime, the Presentation Engine may then request elements of the spatial description according to the recommendedSpatialComputingConfig parameters.
+
 
 ## Schemas
 
